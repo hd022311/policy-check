@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-size: 19px; font-family: "Microsoft JhengHei", sans-serif; } 
-        select { min-height: 60px !important; font-size: 1.2rem !important; font-weight: bold !important; border-radius: 1rem !important; }
+        select { min-height: 60px !important; font-size: 1.1rem !important; font-weight: bold !important; border-radius: 1rem !important; }
         .fubon-blue { color: #00429d; }
         .fubon-bg { background-color: #00429d; }
         .btn-line { background-color: #06C755; }
@@ -36,24 +36,21 @@
             <h2 class="text-lg font-black text-gray-800 mb-6 flex items-center">
                 <i class="fas fa-id-card-clip mr-2 fubon-blue"></i> 設定保單關係人
             </h2>
-            
             <div class="space-y-6">
                 <div>
-                    <label class="text-xs font-black text-gray-400 uppercase mb-2 block tracking-widest">要保人 (付錢權利人)</label>
+                    <label class="text-xs font-black text-gray-400 mb-2 block tracking-widest uppercase">要保人 (付錢權利人)</label>
                     <select v-model="roles.owner" class="w-full bg-gray-50 border-2 border-gray-100 p-3 outline-none focus:border-blue-500">
                         <option v-for="p in persons" :key="p" :value="p">{{p}}</option>
                     </select>
                 </div>
-
                 <div>
-                    <label class="text-xs font-black text-gray-400 uppercase mb-2 block tracking-widest">被保險人 (保單標的人)</label>
-                    <select v-model="roles.insured" @change="checkBeneficiary" class="w-full bg-gray-50 border-2 border-gray-100 p-3 outline-none focus:border-blue-500">
+                    <label class="text-xs font-black text-gray-400 mb-2 block tracking-widest uppercase">被保險人 (保單標的人)</label>
+                    <select v-model="roles.insured" class="w-full bg-gray-50 border-2 border-gray-100 p-3 outline-none focus:border-blue-500">
                         <option v-for="p in persons" :key="p" :value="p">{{p}}</option>
                     </select>
                 </div>
-
                 <div>
-                    <label class="text-xs font-black text-gray-400 uppercase mb-2 block tracking-widest">身故受益人 (領錢人)</label>
+                    <label class="text-xs font-black text-gray-400 mb-2 block tracking-widest uppercase">身故受益人 (領錢人)</label>
                     <select v-model="roles.beneficiary" class="w-full bg-gray-50 border-2 border-gray-100 p-3 outline-none focus:border-blue-500">
                         <optgroup label="指定人選">
                             <option v-for="p in availableBeneficiaries" :key="p" :value="p">{{p}}</option>
@@ -93,12 +90,24 @@
                         <p class="text-gray-700 leading-relaxed font-bold bg-gray-50 p-5 rounded-2xl border-l-4 border-gray-300 shadow-sm" v-html="res.desc"></p>
                     </div>
 
+                    <div v-if="showSubstantialTax" class="mt-8 border-t border-red-100 pt-6">
+                        <h3 class="text-lg font-black text-red-600 mb-3 flex items-center">
+                            <i class="fas fa-gavel mr-2"></i> 國稅局實質課稅自我檢視
+                        </h3>
+                        <p class="text-[15px] text-gray-500 mb-4 font-bold">符合以下態樣，保險金仍可能被併入遺產課稅：</p>
+                        <div class="grid grid-cols-2 gap-2 text-[14px]">
+                            <div v-for="item in substantialList" :key="item" class="flex items-center p-2 bg-red-50 rounded-lg text-red-800 font-bold">
+                                <i class="far fa-square mr-2"></i> {{ item }}
+                            </div>
+                        </div>
+                    </div>
+
                     <div v-if="hasEstateRisk" class="mt-8 bg-blue-50 border-2 border-blue-100 rounded-[2rem] p-6 text-center">
                         <p class="fubon-blue font-black mb-4 leading-relaxed">
-                            保單恐變為『遺產』或產生『贈與稅』風險。<br>想了解具體分配與金額嗎？
+                            診斷顯示存在『資產課稅』或『繼承爭議』。<br>想確認精確的遺產稅稅金嗎？
                         </p>
                         <a href="https://liff.line.me/2008902145-EOR8LZNp" class="inline-block w-full bg-orange-600 text-white py-5 rounded-2xl text-xl font-black shadow-lg hover:bg-orange-700 active:scale-95 transition-all">
-                            進入風險試算工具 <i class="fas fa-chevron-right ml-1"></i>
+                            計算精確稅金 <i class="fas fa-calculator ml-1"></i>
                         </a>
                     </div>
                 </div>
@@ -114,8 +123,11 @@
 
         <footer class="mt-12 text-center px-4">
             <div class="h-[1px] bg-gray-300 w-full mb-6"></div>
-            <p class="text-[12px] text-gray-400 font-bold leading-relaxed text-justify mb-8">
-                警語：本工具僅供參考。實際保單分配與稅務問題，請以財政部國稅局最新法規與個案實質課稅原則為準。規劃前請洽專業顧問。
+            <p class="text-[13px] text-gray-400 font-bold leading-relaxed text-justify mb-8">
+                ⚠️ 注意事項與警語：<br>
+                1. 本工具僅供初步風險診斷參考。實際遺產稅、贈與稅及所得稅之核課，應以財政部國稅局依個案事實、最新法規及「實質課稅原則」認定為準。<br>
+                2. 2026年起身故保險金計入基本所得額之免稅扣除額為 3,740 萬元，遺產稅免稅額為 1,333 萬元。相關數據隨物價指數調整，請洽詢專業顧問獲取即時資訊。<br>
+                3. 保單架構異動可能影響契約效力或衍生其他稅務，變更前務必諮詢您的保險顧問。
             </p>
             <div class="fubon-blue font-black text-sm tracking-widest opacity-70">
                 富邦俊德 ‧ 您的家族資產守護者
@@ -129,12 +141,11 @@
 
         createApp({
             setup() {
-                // 已更新為您的專屬 ID: @hd022311
                 const lineAccountID = "hd022311"; 
-
                 const persons = ['父', '母', '大孩子', '二孩子', '三孩子', '爺爺', '奶奶'];
                 const roles = reactive({ owner: '父', insured: '母', beneficiary: '大孩子' });
                 const deadPerson = ref(null);
+                const substantialList = ['高齡投保', '鉅額投保', '密集投保', '短期投保', '帶病投保', '躉繳投保', '舉債投保', '保費略高'];
 
                 const availableBeneficiaries = computed(() => persons.filter(p => p !== roles.insured));
                 
@@ -148,11 +159,6 @@
                     deadPerson.value = (deadPerson.value === name) ? null : name;
                 };
 
-                const checkBeneficiary = () => {
-                    if (roles.insured === roles.beneficiary) roles.beneficiary = availableBeneficiaries.value[0];
-                };
-
-                // 更新為對應您 ID 的聯絡連結
                 const lineContactLink = computed(() => {
                     const message = encodeURIComponent("我要保單總體檢");
                     return `https://line.me/R/oaMessage/@${lineAccountID}/?${message}`;
@@ -162,40 +168,50 @@
                     let r = [];
                     let score = 0;
                     let riskFlag = false;
+                    let isSubstantial = false;
 
-                    if (!deadPerson.value) return { reports: r, score, riskFlag };
+                    if (!deadPerson.value) return { reports: r, score, riskFlag, isSubstantial };
 
+                    // 1. 要保人先過世
                     if (deadPerson.value === roles.owner && deadPerson.value !== roles.insured) {
                         score = 2; riskFlag = true;
-                        r.push({ title: "資產歸屬風險", desc: `因要保人『${roles.owner}』先過世，該份保單的『現金價值』將計入『${roles.owner}』的『遺產』中。` });
-                        r.push({ title: "繼承卡關風險", desc: `變更『新要保人』必須取得『全體繼承人簽名同意』。只要有一人不簽，資產分配將陷入長久凍結。` });
+                        r.push({ title: "遺產稅申報風險", desc: `因要保人『${roles.owner}』先過世，保單財產價值將計入『${roles.owner}』的遺產總額。` });
+                        r.push({ title: "資產凍結風險", desc: `變更要保人須全體繼承人簽名，若一人反對則保單陷入凍結。` });
                     }
+                    // 2. 被保險人過世
                     else if (deadPerson.value === roles.insured) {
+                        // 要/被同一人：無贈與稅問題
+                        if (roles.owner === roles.insured) {
+                            score = 0; isSubstantial = true;
+                            r.push({ title: "理賠金給付順利", desc: `符合「要被同一人」，領取身故金無贈與稅問題，且原則上不計入遺產。但仍須留意下方「實質課稅原則」。` });
+                        } 
+                        // 要/受不同人：涉及所得稅最低稅負
                         if (roles.owner !== roles.beneficiary && roles.beneficiary !== '法定繼承人') {
                             score = 1; riskFlag = true;
-                            r.push({ title: "贈與稅風險", desc: `因『要保人』與『身故受益人』非同一人，保險金給付時將被視為『${roles.owner}』對『${roles.beneficiary}』的贈與。` });
-                            r.push({ title: "稅額提示", desc: `若金額超過年度贈與免稅額『244 萬』，要保人須依法申報並繳納『贈與稅』。` });
-                        } else if (roles.beneficiary === '法定繼承人') {
+                            // 只有在要保人活著領滿期金才有贈與稅，身故金主要是最低稅負制問題
+                            r.push({ title: "所得稅最低稅負風險", desc: `因要保人與受益人不同人，同一申報戶身故給付全年超過 <b>3,740 萬元</b>部分需計入所得稅基本所得額。` });
+                        }
+                        if (roles.beneficiary === '法定繼承人') {
                             score = 1;
-                            r.push({ title: "分配權限受阻", desc: `保險金將依法律預設比例分配給『法定繼承人』，無法依照您的個人意願給特定人，領取手續亦較為繁瑣。` });
-                        } else {
-                            score = 0;
-                            r.push({ title: "理賠順利給付", desc: `保險金由指定受益人『${roles.beneficiary}』領取，程序最為簡便且分配明確。` });
+                            r.push({ title: "法律預設分配", desc: "保險金將依比例分配給法定繼承人，程序較繁瑣且無法指定特定人領取。" });
                         }
                     }
+                    // 3. 受益人先過世
                     else if (deadPerson.value === roles.beneficiary) {
                         score = 2; riskFlag = true;
-                        r.push({ title: "分配懸空風險", desc: `受益人『${roles.beneficiary}』已先身故，若未及時變更，未來理賠將變回『被保險人的遺產』，恐引發不必要的繼承紛爭。` });
+                        r.push({ title: "領取權限受阻", desc: `受益人『${roles.beneficiary}』已先身故，理賠金將變回【被保險人】的遺產。` });
+                        r.push({ title: "繼承簽名風險", desc: `領取理賠金時，必須備齊被保險人『${roles.insured}』的<b>所有法定繼承人</b>簽名同意，實務上極易產生分產糾紛。` });
                     }
 
-                    return { reports: r, score, hasEstateRisk: riskFlag };
+                    return { reports: r, score, hasEstateRisk: riskFlag, isSubstantial };
                 });
 
                 return {
-                    persons, roles, deadPerson, involved, availableBeneficiaries, lineContactLink,
-                    setDead, checkBeneficiary,
+                    persons, roles, deadPerson, involved, availableBeneficiaries, lineContactLink, substantialList,
+                    setDead, 
                     analysisReports: computed(() => analysis.value.reports),
                     hasEstateRisk: computed(() => analysis.value.hasEstateRisk),
+                    showSubstantialTax: computed(() => analysis.value.isSubstantial),
                     riskColor: computed(() => ['bg-green-600', 'bg-orange-500', 'bg-red-600'][analysis.value.score])
                 };
             }
