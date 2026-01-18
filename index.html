@@ -145,7 +145,7 @@
                 const persons = ['父', '母', '大孩子', '二孩子', '三孩子', '爺爺', '奶奶'];
                 const roles = reactive({ owner: '父', insured: '母', beneficiary: '大孩子' });
                 const deadPerson = ref(null);
-                const substantialList = ['高齡投保', '鉅額投保', '密集投保', '短期投保', '帶病投保', '躉繳投保', '舉債投保', '保費略高'];
+                const substantialList = ['高齡投保', '鉅額投保', '密集投保', '短期投保', '帶病投保', '躉繳投保', '舉債投保', '保費高於給付'];
 
                 const availableBeneficiaries = computed(() => persons.filter(p => p !== roles.insured));
                 
