@@ -12,7 +12,7 @@
         select { min-height: 60px !important; font-size: 1.1rem !important; font-weight: bold !important; border-radius: 1rem !important; }
         .fubon-blue { color: #00429d; }
         .fubon-bg { background-color: #00429d; }
-        .btn-line { background-color: #06C755; }
+        .btn-action { background-color: #00429d; }
         .animate-bounce-subtle { animation: bounceSubtle 2s infinite; }
         @keyframes bounceSubtle { 
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
@@ -114,10 +114,10 @@
             </div>
 
             <div class="pt-6">
-                <a :href="lineContactLink" class="btn-line w-full text-white py-6 rounded-[2rem] text-2xl font-black shadow-xl flex items-center justify-center animate-bounce-subtle">
-                    <i class="fab fa-line text-3xl mr-3"></i> 聯絡俊德保單總體檢
+                <a href="https://hd022311.github.io/risk-assessment/" class="btn-action w-full text-white py-6 rounded-[2rem] text-2xl font-black shadow-xl flex items-center justify-center animate-bounce-subtle">
+                    <i class="fas fa-shield-halved text-3xl mr-3"></i> 60秒，評估家族傳承風險
                 </a>
-                <p class="text-center text-sm text-gray-500 mt-4 font-bold">點擊按鈕將開啟聊天室<br>並自動輸入「我要保單總體檢」</p>
+                <p class="text-center text-sm text-gray-500 mt-4 font-bold">即刻進行專業評估，守護家族資產</p>
             </div>
         </div>
 
@@ -141,11 +141,10 @@
 
         createApp({
             setup() {
-                const lineAccountID = "hd022311"; 
                 const persons = ['父', '母', '大孩子', '二孩子', '三孩子', '爺爺', '奶奶'];
                 const roles = reactive({ owner: '父', insured: '母', beneficiary: '大孩子' });
                 const deadPerson = ref(null);
-                const substantialList = ['高齡投保', '鉅額投保', '密集投保', '短期投保', '帶病投保', '躉繳投保', '舉債投保', '保費高於給付'];
+                const substantialList = ['高齡投保', '鉅額投保', '密集投保', '短期投保', '帶病投保', '躉繳投保', '舉債投保', '保費大於給付'];
 
                 const availableBeneficiaries = computed(() => persons.filter(p => p !== roles.insured));
                 
@@ -159,11 +158,6 @@
                     deadPerson.value = (deadPerson.value === name) ? null : name;
                 };
 
-                const lineContactLink = computed(() => {
-                    const message = encodeURIComponent("我要保單總體檢");
-                    return `https://line.me/R/oaMessage/@${lineAccountID}/?${message}`;
-                });
-
                 const analysis = computed(() => {
                     let r = [];
                     let score = 0;
@@ -172,23 +166,18 @@
 
                     if (!deadPerson.value) return { reports: r, score, riskFlag, isSubstantial };
 
-                    // 1. 要保人先過世
                     if (deadPerson.value === roles.owner && deadPerson.value !== roles.insured) {
                         score = 2; riskFlag = true;
                         r.push({ title: "遺產稅申報風險", desc: `因要保人『${roles.owner}』先過世，保單財產價值將計入『${roles.owner}』的遺產總額。` });
                         r.push({ title: "資產凍結風險", desc: `變更要保人須全體繼承人簽名，若一人反對則保單陷入凍結。` });
                     }
-                    // 2. 被保險人過世
                     else if (deadPerson.value === roles.insured) {
-                        // 要/被同一人：無贈與稅問題
                         if (roles.owner === roles.insured) {
                             score = 0; isSubstantial = true;
                             r.push({ title: "理賠金給付順利", desc: `符合「要被同一人」，領取身故金無贈與稅問題，且原則上不計入遺產。但仍須留意下方「實質課稅原則」。` });
                         } 
-                        // 要/受不同人：涉及所得稅最低稅負
                         if (roles.owner !== roles.beneficiary && roles.beneficiary !== '法定繼承人') {
                             score = 1; riskFlag = true;
-                            // 只有在要保人活著領滿期金才有贈與稅，身故金主要是最低稅負制問題
                             r.push({ title: "所得稅最低稅負風險", desc: `因要保人與受益人不同人，同一申報戶身故給付全年超過 <b>3,740 萬元</b>部分需計入所得稅基本所得額。` });
                         }
                         if (roles.beneficiary === '法定繼承人') {
@@ -196,7 +185,6 @@
                             r.push({ title: "法律預設分配", desc: "保險金將依比例分配給法定繼承人，程序較繁瑣且無法指定特定人領取。" });
                         }
                     }
-                    // 3. 受益人先過世
                     else if (deadPerson.value === roles.beneficiary) {
                         score = 2; riskFlag = true;
                         r.push({ title: "領取權限受阻", desc: `受益人『${roles.beneficiary}』已先身故，理賠金將變回【被保險人】的遺產。` });
@@ -207,7 +195,7 @@
                 });
 
                 return {
-                    persons, roles, deadPerson, involved, availableBeneficiaries, lineContactLink, substantialList,
+                    persons, roles, deadPerson, involved, availableBeneficiaries, substantialList,
                     setDead, 
                     analysisReports: computed(() => analysis.value.reports),
                     hasEstateRisk: computed(() => analysis.value.hasEstateRisk),
